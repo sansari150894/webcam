@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 
 function setupWebCam(setStream) {
   const mediaOptions = { audio: false, video: true };
@@ -20,15 +21,22 @@ function setupWebCam(setStream) {
   });
 }
 
-export default class WebCamera extends React.Component {
+class WebCamera extends React.Component {
   constructor(props) {
     super(props);
     this.state = { stream: null };
     this.setStream = this.setStream.bind(this);
   }
 
-  componentDidMount() {
-    setupWebCam(this.setStream);
+  componentDidUpdate(prevProps) {
+    if (this.props.toggleState !== prevProps.toggleState) {
+      if (this.props.toggleState) {
+        setupWebCam(this.setStream);
+      } else {
+        this.state.stream &&
+          this.state.stream.getTracks().forEach(track => track.stop());
+      }
+    }
   }
 
   setStream(stream) {
@@ -38,7 +46,7 @@ export default class WebCamera extends React.Component {
     return this.state.stream ? (
       <video
         src={window.URL.createObjectURL(this.state.stream)}
-        style={{ width: "200px", height: "300px" }}
+        style={{ width: "600px", height: "400px" }}
         id="player"
         autoplay="true"
       />
@@ -47,3 +55,7 @@ export default class WebCamera extends React.Component {
     );
   }
 }
+
+export default connect(state => ({ toggleState: state.toggleState }))(
+  WebCamera
+);
