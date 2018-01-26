@@ -27,11 +27,14 @@ export default class WebCamera extends React.Component {
     this.setStream = this.setStream.bind(this);
   }
 
+  componentDidMount() {
+    setupWebCam(this.setStream);
+  }
+
   setStream(stream) {
     this.setState({ stream });
   }
   render() {
-    setupWebCam(this.setStream);
     return this.state.stream ? (
       <video
         src={window.URL.createObjectURL(this.state.stream)}
